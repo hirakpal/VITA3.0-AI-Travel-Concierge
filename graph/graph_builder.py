@@ -134,9 +134,9 @@ def approval_node(state: VitaState):
 
     return state
 
-# -------------------------------------------------------
-# Graph
-# -------------------------------------------------------
+# ==========================================================
+# Build Router
+# ==========================================================
 
 # ---------------------------------------------------------
 # Discovery Router
@@ -188,3 +188,153 @@ def approval_router(state: VitaState):
         return END
 
     return "planner"
+
+
+# ==========================================================
+# Build Graph
+# ==========================================================
+
+builder = StateGraph(VitaState)
+
+# ----------------------------------------------------------
+# Nodes
+# ----------------------------------------------------------
+
+builder.add_node("conversation", conversation_node)
+
+builder.add_node("discovery", discovery_node)
+
+builder.add_node("clarification", clarification_node)
+
+builder.add_node("map", map_node)
+
+builder.add_node("planner", planner_node)
+
+builder.add_node("recommendation", recommendation_node)
+
+builder.add_node("approval", approval_node)
+
+# ----------------------------------------------------------
+# Entry Point
+# ----------------------------------------------------------
+
+builder.set_entry_point("conversation")
+
+# ----------------------------------------------------------
+# Fixed Edge
+# ----------------------------------------------------------
+
+builder.add_edge(
+    "conversation",
+    "discovery"
+)
+
+# ----------------------------------------------------------
+# Discovery Routing
+# ----------------------------------------------------------
+
+builder.add_conditional_edges(
+
+    "discovery",
+
+    discovery_router,
+
+    {
+
+        "clarification": "clarification",
+
+        "map": "map"
+
+    }
+
+)
+
+# ----------------------------------------------------------
+# Clarification
+# ----------------------------------------------------------
+
+builder.add_edge(
+
+    "clarification",
+
+    "conversation"
+
+)
+
+# ----------------------------------------------------------
+# Map Routing
+# ----------------------------------------------------------
+
+builder.add_conditional_edges(
+
+    "map",
+
+    map_router,
+
+    {
+
+        "clarification": "clarification",
+
+        "planner": "planner"
+
+    }
+
+)
+
+# ----------------------------------------------------------
+# Planner Routing
+# ----------------------------------------------------------
+
+builder.add_conditional_edges(
+
+    "planner",
+
+    planner_router,
+
+    {
+
+        "clarification": "clarification",
+
+        "recommendation": "recommendation"
+
+    }
+
+)
+
+# ----------------------------------------------------------
+# Recommendation
+# ----------------------------------------------------------
+
+builder.add_edge(
+
+    "recommendation",
+
+    "approval"
+
+)
+
+# ----------------------------------------------------------
+# Approval Routing
+# ----------------------------------------------------------
+
+builder.add_conditional_edges(
+
+    "approval",
+
+    approval_router,
+
+    {
+
+        "planner": "planner",
+
+        END: END
+
+    }
+
+)
+
+# ----------------------------------------------------------
+# Compile
+# ----------------------------------------------------------
+
+graph = builder.compile()
