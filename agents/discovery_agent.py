@@ -23,6 +23,7 @@ import json
 import re
 
 from agents.base_agent import BaseAgent
+from models.destination import Destination
 from models.response import AgentResponse
 
 
@@ -39,10 +40,9 @@ class DiscoveryAgent(BaseAgent):
     def execute(self, state):
         response = self.run(state)
 
-        state.set_response(response)
         state.set_agent("Discovery Agent")
         state.set_step("Discovery")
-        
+
         return state
     
     def run(
@@ -132,6 +132,33 @@ Conversation
 
             state.travel_dna.update_interest(
                 interest
+            )
+
+        destination_text = data.get("destination", "").strip()
+
+        if destination_text and not state.destinations:
+
+            parts = [
+                p.strip()
+                for p in destination_text.split(",")
+                if p.strip()
+            ]
+
+            city = parts[0] if parts else destination_text
+            country = parts[1] if len(parts) > 1 else ""
+
+            destination = Destination(
+                city=city,
+                country=country
+            )
+
+            destination.update_confidence()
+
+            state.add_destination(destination)
+
+            self.audit(
+                state,
+                f"Destination identified: {destination.display_name}"
             )
 
         traveller.update_confidence()

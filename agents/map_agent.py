@@ -6,7 +6,6 @@ VITA 3.0
 from __future__ import annotations
 
 from agents.base_agent import BaseAgent
-from models.destination import Destination
 
 
 class MapAgent(BaseAgent):
@@ -17,30 +16,26 @@ class MapAgent(BaseAgent):
     def run(
         self,
         state,
-        city: str = "",
-        country: str = "",
-        latitude: float = 0.0,
-        longitude: float = 0.0,
         **kwargs
     ):
 
-        destination = Destination(
-            city=city,
-            country=country
-        )
+        if not state.destinations:
 
-        destination.coordinates.latitude = latitude
-        destination.coordinates.longitude = longitude
+            return self.failure(
+                "No destination available to map."
+            )
 
-        state.add_destination(destination)
+        destination = state.destinations[-1]
+
+        destination.update_confidence()
 
         self.audit(
             state,
-            f"Destination added: {destination.display_name}"
+            f"Destination mapped: {destination.display_name}"
         )
 
         return self.success(
-            "Destination added.",
+            "Destination mapped.",
             confidence=1.0,
             destination=destination.model_dump()
         )

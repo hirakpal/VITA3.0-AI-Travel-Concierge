@@ -64,33 +64,33 @@ Return ONLY JSON.
 
 {{
 "hotel":[
-{
+{{
 "name":"",
 "rating":4.8,
 "price":220
-}
+}}
 ],
 
 "restaurants":[
-{
+{{
 "name":"",
 "rating":4.7
-}
+}}
 ],
 
 "attractions":[
-{
+{{
 "name":"",
 "rating":4.9,
 "duration":"2 Hours"
-}
+}}
 ],
 
 "activities":[
-{
+{{
 "name":"",
 "duration":"Half Day"
-}
+}}
 ]
 }}
 """
@@ -225,6 +225,8 @@ Return ONLY JSON.
                 )
 
         state.recommendations = collection
+
+        state.awaiting_approval = True
 
         self.audit(
             state,

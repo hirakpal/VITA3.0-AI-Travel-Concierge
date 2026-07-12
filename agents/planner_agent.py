@@ -112,8 +112,6 @@ Return ONLY JSON.
 
         state.itinerary = itinerary
 
-        state.awaiting_approval = True
-
         response = self.success(
 
             "Itinerary created successfully.",

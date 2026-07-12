@@ -45,12 +45,11 @@ class ApprovalAgent(BaseAgent):
         )
 
         # Update workflow state for the UI
-        state.current_agent = "Approval Agent"
-        state.current_stage = "Approval"
-        state.progress = 1.0
+        state.set_response(result)
+        state.set_agent("Approval Agent")
+        state.set_stage("Approval")
 
-        if hasattr(state, "assistant_response"):
-            state.assistant_response = result.message
+        state.assistant_response = result.message
 
         return state
 
