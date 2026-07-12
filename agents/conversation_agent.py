@@ -1,5 +1,5 @@
 """
-Conversation Manager
+Conversation Agent
 VITA 3.0
 
 Main orchestrator.
