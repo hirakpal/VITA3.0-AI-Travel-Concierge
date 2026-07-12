@@ -1,5 +1,8 @@
 """
-LangGraph Builder
+graph_builder.py
+
+LangGraph Workflow
+VITA 3.0
 """
 
 from langgraph.graph import StateGraph, END
@@ -26,6 +29,10 @@ approval = ApprovalAgent()
 # Nodes
 # -------------------------------------------------------
 
+# ---------------------------------------------------------
+# Conversation
+# ---------------------------------------------------------
+
 def conversation_node(state: VitaState):
 
     conversation.execute(
@@ -36,6 +43,10 @@ def conversation_node(state: VitaState):
     return state
 
 
+# ---------------------------------------------------------
+# Discovery
+# ---------------------------------------------------------
+
 def discovery_node(state: VitaState):
 
     discovery.execute(
@@ -44,18 +55,54 @@ def discovery_node(state: VitaState):
 
     return state
 
-def discovery_router(state: VitaState):
 
-    if state.traveller.confidence < 0.80:
+# ---------------------------------------------------------
+# Clarification
+# ---------------------------------------------------------
 
-        return "conversation"
+def clarification_node(state: VitaState):
 
-    return "map"
+    """
+    Ask ONE intelligent follow-up question.
+    """
+
+    traveller = state.traveller
+
+    question = "Tell me more about your trip."
+
+    if traveller.trip_purpose == "":
+
+        question = "What is the purpose of your trip?"
+
+    elif traveller.budget <= 0:
+
+        question = "What is your approximate budget?"
+
+    elif len(state.destinations) == 0:
+
+        question = "Which destination would you like to visit?"
+
+    elif traveller.travel_style == "":
+
+        question = "How would you describe your travel style?"
+
+    state.assistant_response = question
+
+    return state
+
+
+# ---------------------------------------------------------
+# Map
+# ---------------------------------------------------------
 
 def map_node(state: VitaState):
 
     return state
 
+
+# ---------------------------------------------------------
+# Planner
+# ---------------------------------------------------------
 
 def planner_node(state: VitaState):
 
@@ -65,14 +112,10 @@ def planner_node(state: VitaState):
 
     return state
 
-def planner_router(state: VitaState):
 
-    if state.validation_score < 0.80:
-
-        return "conversation"
-
-    return "recommendation"
-
+# ---------------------------------------------------------
+# Recommendation
+# ---------------------------------------------------------
 
 def recommendation_node(state: VitaState):
 
@@ -83,9 +126,60 @@ def recommendation_node(state: VitaState):
     return state
 
 
+# ---------------------------------------------------------
+# Approval
+# ---------------------------------------------------------
+
 def approval_node(state: VitaState):
 
     return state
+
+# -------------------------------------------------------
+# Graph
+# -------------------------------------------------------
+
+# ---------------------------------------------------------
+# Discovery Router
+# ---------------------------------------------------------
+
+def discovery_router(state: VitaState):
+
+    if state.traveller.confidence < 0.80:
+
+        return "clarification"
+
+    return "map"
+
+
+# ---------------------------------------------------------
+# Map Router
+# ---------------------------------------------------------
+
+def map_router(state: VitaState):
+
+    if len(state.destinations) == 0:
+
+        return "clarification"
+
+    return "planner"
+
+
+# ---------------------------------------------------------
+# Planner Router
+# ---------------------------------------------------------
+
+def planner_router(state: VitaState):
+
+    if state.validation_score < 0.80:
+
+        return "clarification"
+
+    return "recommendation"
+
+
+# ---------------------------------------------------------
+# Approval Router
+# ---------------------------------------------------------
 
 def approval_router(state: VitaState):
 
@@ -94,74 +188,3 @@ def approval_router(state: VitaState):
         return END
 
     return "planner"
-
-
-# -------------------------------------------------------
-# Graph
-# -------------------------------------------------------
-
-builder = StateGraph(VitaState)
-
-builder.add_node("conversation", conversation_node)
-
-builder.add_node("discovery", discovery_node)
-
-builder.add_node("map", map_node)
-
-builder.add_node("planner", planner_node)
-
-builder.add_node("recommendation", recommendation_node)
-
-builder.add_node("approval", approval_node)
-
-builder.set_entry_point("conversation")
-
-builder.add_conditional_edges(
-
-    "discovery",
-
-    discovery_router,
-
-    {
-
-        "conversation": "conversation",
-
-        "map": "map"
-
-    }
-
-)
-
-builder.add_conditional_edges(
-
-    "planner",
-
-    planner_router,
-
-    {
-
-        "conversation": "conversation",
-
-        "recommendation": "recommendation"
-
-    }
-
-)
-
-builder.add_conditional_edges(
-
-    "approval",
-
-    approval_router,
-
-    {
-
-        "planner": "planner",
-
-        END: END
-
-    }
-
-)
-
-graph = builder.compile()
