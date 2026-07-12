@@ -39,45 +39,17 @@ class BaseAgent(ABC):
     # =====================================================
 
     @safe_execute("BaseAgent")
-    def execute(
+    def execute(self, state):
+        response = self.run(state=state)
 
-        self,
+        if not isinstance(response, AgentResponse):
+            return state
 
-        session_id: str,
+        state.set_response(response)
+        state.set_agent(self.name)
 
-        **kwargs
-
-    ) -> AgentResponse:
-
-        state = self.memory.get_state(session_id)
-
-        if state is None:
-
-            state = self.memory.start_session(session_id)
-
-        response = self.run(
-
-            state=state,
-
-            **kwargs
-
-        )
-
-        if isinstance(response, AgentResponse):
-
-            state.set_response(response)
-
-            state.set_agent(self.name)
-
-            self.memory.save_state(state)
-
-            return response
-
-        return AgentResponse.fail(
-
-            f"{self.name} returned invalid response."
-
-        )
+        self.memory.save_state(state)
+        return state
 
     # =====================================================
     # Abstract
