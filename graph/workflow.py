@@ -7,20 +7,23 @@ class Workflow:
     def run(
         self,
         session_id: str,
-        message: str
+        message: str,
     ):
 
-        state = memory_service.start_session(
-            session_id
-        )
+        # Restore previous state
+        state = memory_service.start_session(session_id)
 
+        # Update latest user message
         state.user_input = message
 
-        result = graph.invoke(state)
+        # Execute LangGraph
+        state = graph.invoke(state)
 
-        memory_service.save_state(result)
+        # Persist latest state
+        memory_service.save_state(state)
 
-        return result
+        return state
 
 
+workflow = Workflow()
 workflow = Workflow()
