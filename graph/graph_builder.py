@@ -35,12 +35,7 @@ approval = ApprovalAgent()
 
 def conversation_node(state: VitaState):
 
-    conversation.execute(
-        session_id=state.session_id,
-        message=state.user_input
-    )
-
-    return state
+    return conversation.execute(state)
 
 
 # ---------------------------------------------------------
@@ -49,11 +44,7 @@ def conversation_node(state: VitaState):
 
 def discovery_node(state: VitaState):
 
-    discovery.execute(
-        session_id=state.session_id
-    )
-
-    return state
+    return discovery.execute(state)
 
 
 # ---------------------------------------------------------
@@ -97,7 +88,7 @@ def clarification_node(state: VitaState):
 
 def map_node(state: VitaState):
 
-    return state
+    return map_agent.execute(state)
 
 
 # ---------------------------------------------------------
@@ -106,11 +97,7 @@ def map_node(state: VitaState):
 
 def planner_node(state: VitaState):
 
-    planner.execute(
-        session_id=state.session_id
-    )
-
-    return state
+    return planner.execute(state)
 
 
 # ---------------------------------------------------------
@@ -119,11 +106,7 @@ def planner_node(state: VitaState):
 
 def recommendation_node(state: VitaState):
 
-    recommendation.execute(
-        session_id=state.session_id
-    )
-
-    return state
+    return recommendation.execute(state)
 
 
 # ---------------------------------------------------------
@@ -132,7 +115,7 @@ def recommendation_node(state: VitaState):
 
 def approval_node(state: VitaState):
 
-    return state
+    return approval.execute(state)
 
 # ==========================================================
 # Build Router
