@@ -4,9 +4,9 @@ import streamlit as st
 # Theme
 # --------------------------------------------------
 
-from ui.core.theme import load_theme
-from ui.core.header import render_header
-from ui.core.layout import create_layout
+from ui.layout.theme import apply_theme
+from ui.layout.header import render_header
+from ui.layout.layout import render_layout
 
 # --------------------------------------------------
 # Workflow
@@ -21,13 +21,12 @@ from graph.workflow import workflow
 from ui.chat.chat_panel import render_chat_panel
 from ui.map.map_canvas import render_map_canvas
 from ui.map.destination_panel import render_destination_panel
-from ui.cards.recommendation_cards import render_recommendation_cards
-from ui.timeline.itinerary_timeline import render_itinerary
-from ui.dna.travel_dna import render_travel_dna
+from ui.recommendations.recommendation_cards import render_recommendation_cards
+from ui.itinerary.itinerary_timeline import render_itinerary
+from ui.travel_dna.travel_dna import render_travel_dna
 from ui.validator.trip_validator_panel import render_trip_validator
 from ui.audit.audit_dashboard import render_audit_dashboard
 from ui.mission.mission_control import render_mission_control
-
 
 # ======================================================
 # PAGE
