@@ -128,7 +128,9 @@ def approval_node(state: VitaState):
 def discovery_router(state: VitaState):
 
     if state.traveller.confidence < 0.80:
+        return "clarification"
 
+    if len(state.destinations) == 0:
         return "clarification"
 
     return "map"
@@ -166,8 +168,7 @@ def planner_router(state: VitaState):
 
 def approval_router(state: VitaState):
 
-    if state.approved:
-
+    if state.approval_status == "APPROVED":
         return END
 
     return "planner"
@@ -240,7 +241,7 @@ builder.add_edge(
 
     "clarification",
 
-    "conversation"
+    END
 
 )
 
