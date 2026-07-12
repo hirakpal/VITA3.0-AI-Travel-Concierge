@@ -9,7 +9,7 @@ from langgraph.graph import StateGraph, END
 
 from state.vita_state import VitaState
 
-from agents.conversation_manager import ConversationManager
+from agents.conversation_agent import ConversationManager
 from agents.discovery_agent import DiscoveryAgent
 from agents.map_agent import MapAgent
 from agents.planner_agent import PlannerAgent
