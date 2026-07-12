@@ -14,9 +14,6 @@ def render_header():
                     🌍 VITA 3.0
                 </div>
 
-                <div style="color:#94A3B8;font-size:15px;">
-                    Intelligent AI Travel Concierge
-                </div>
             </div>
             """,
             unsafe_allow_html=True,
