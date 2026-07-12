@@ -6,61 +6,97 @@ import streamlit as st
 
 
 def render_chat_panel(state):
-    """
-    Render the conversation panel.
-    Returns the latest user prompt.
-    """
 
     st.subheader("💬 VITA AI Travel Concierge")
-
-    # -----------------------------------------
-    # Initialise messages
-    # -----------------------------------------
 
     if "messages" not in st.session_state:
 
         st.session_state.messages = [
 
             {
-
                 "role": "assistant",
-
-                "content": "👋 Hello! I'm VITA. Where would you like to travel?"
-
+                "content": "👋 Hello! I'm VITA. Where would you like to travel today?"
             }
 
         ]
 
-    # -----------------------------------------
-    # Render chat history
-    # -----------------------------------------
+    # -----------------------------
+    # Chat History
+    # -----------------------------
 
-    for message in st.session_state.messages:
+    history = st.container(height=500)
 
-        with st.chat_message(message["role"]):
+    with history:
 
-            st.markdown(message["content"])
+        for msg in st.session_state.messages:
 
-    # -----------------------------------------
-    # User Input
-    # -----------------------------------------
+            if msg["role"] == "assistant":
 
-    prompt = st.chat_input(
-        "Ask VITA anything..."
-    )
+                st.markdown(
+                    f"""
+<div style="
+background:#1E293B;
+padding:12px;
+border-radius:12px;
+margin-bottom:10px;
+border-left:4px solid #3B82F6;
+">
+🤖 {msg['content']}
+</div>
+""",
+                    unsafe_allow_html=True,
+                )
 
-    if prompt:
+            else:
+
+                st.markdown(
+                    f"""
+<div style="
+background:#334155;
+padding:12px;
+border-radius:12px;
+margin-bottom:10px;
+text-align:right;
+border-right:4px solid #8B5CF6;
+">
+🧑 {msg['content']}
+</div>
+""",
+                    unsafe_allow_html=True,
+                )
+
+    st.divider()
+
+    # -----------------------------
+    # Input
+    # -----------------------------
+
+    c1, c2 = st.columns([8, 1])
+
+    with c1:
+
+        prompt = st.text_input(
+            "",
+            placeholder="Ask VITA anything...",
+            label_visibility="collapsed",
+            key="vita_chat"
+        )
+
+    with c2:
+
+        send = st.button(
+            "➤",
+            use_container_width=True,
+            type="primary"
+        )
+
+    if send and prompt:
 
         st.session_state.messages.append(
-
             {
-
                 "role": "user",
-
                 "content": prompt
-
             }
-
         )
 
         return prompt
