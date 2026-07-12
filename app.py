@@ -1,116 +1,157 @@
 import streamlit as st
 
-# ---------------------------------------------------
+# --------------------------------------------------
 # Theme
-# ---------------------------------------------------
+# --------------------------------------------------
 
-from ui.layout.theme import apply_theme
-from ui.layout.header import render_header
-from ui.layout.layout import render_layout
+from ui.core.theme import load_theme
+from ui.core.header import render_header
+from ui.core.layout import create_layout
 
-# ---------------------------------------------------
-# Components
-# ---------------------------------------------------
+# --------------------------------------------------
+# Workflow
+# --------------------------------------------------
+
+from graph.workflow import workflow
+
+# --------------------------------------------------
+# UI Panels
+# --------------------------------------------------
 
 from ui.chat.chat_panel import render_chat_panel
+from ui.map.map_canvas import render_map_canvas
+from ui.map.destination_panel import render_destination_panel
+from ui.cards.recommendation_cards import render_recommendation_cards
+from ui.timeline.itinerary_timeline import render_itinerary
+from ui.dna.travel_dna import render_travel_dna
+from ui.validator.trip_validator_panel import render_trip_validator
+from ui.audit.audit_dashboard import render_audit_dashboard
+from ui.mission.mission_control import render_mission_control
 
-# (Coming next)
-# from ui.map.map_panel import render_map_panel
-# from ui.mission.mission_control import render_mission_control
-# from ui.recommendations.recommendation_panel import render_recommendation_panel
-# from ui.travel_dna.travel_dna_panel import render_travel_dna_panel
-# from ui.itinerary.itinerary_timeline import render_itinerary
-# from ui.validator.trip_validator_panel import render_trip_validator
-# from ui.audit.audit_panel import render_audit_panel
 
+# ======================================================
+# PAGE
+# ======================================================
 
-# ===================================================
-# App Configuration
-# ===================================================
+st.set_page_config(
+    page_title="VITA 3.0",
+    layout="wide",
+    initial_sidebar_state="collapsed"
+)
 
-apply_theme()
+load_theme()
+
+# ======================================================
+# SESSION
+# ======================================================
+
+if "session_id" not in st.session_state:
+
+    st.session_state.session_id = "demo"
+
+if "state" not in st.session_state:
+
+    st.session_state.state = workflow.run(
+        session_id="demo",
+        message="Hello"
+    )
+
+# ======================================================
+# HEADER
+# ======================================================
 
 render_header()
 
-layout = render_layout()
+# ======================================================
+# LAYOUT
+# ======================================================
 
+layout = create_layout()
 
-# ===================================================
+state = st.session_state.state
+
+# ======================================================
 # CHAT
-# ===================================================
+# ======================================================
 
 with layout["chat"]:
 
-    render_chat_panel()
+    prompt = render_chat_panel(state)
 
+    if prompt:
 
-# ===================================================
+        state = workflow.run(
+
+            session_id=st.session_state.session_id,
+
+            message=prompt
+
+        )
+
+        st.session_state.state = state
+
+        st.rerun()
+
+# ======================================================
 # MAP
-# ===================================================
+# ======================================================
 
 with layout["map"]:
 
-    st.info("🗺️ Interactive Map (Coming Next)")
+    render_map_canvas(state)
 
-
-# ===================================================
-# MISSION CONTROL
-# ===================================================
+# ======================================================
+# MISSION
+# ======================================================
 
 with layout["mission"]:
 
-    st.info("🚀 Mission Control")
+    render_mission_control(state)
 
-
-# ===================================================
+# ======================================================
 # DESTINATIONS
-# ===================================================
+# ======================================================
 
 with layout["destinations"]:
 
-    st.info("📍 Selected Destinations")
+    render_destination_panel(state)
 
-
-# ===================================================
+# ======================================================
 # RECOMMENDATIONS
-# ===================================================
+# ======================================================
 
 with layout["recommendations"]:
 
-    st.info("🏨 Recommendation Cards")
+    render_recommendation_cards(state)
 
-
-# ===================================================
+# ======================================================
 # TRAVEL DNA
-# ===================================================
+# ======================================================
 
 with layout["travel_dna"]:
 
-    st.info("🧬 Travel DNA")
+    render_travel_dna(state)
 
-
-# ===================================================
-# ITINERARY
-# ===================================================
+# ======================================================
+# TIMELINE
+# ======================================================
 
 with layout["timeline"]:
 
-    st.info("📅 Itinerary Timeline")
+    render_itinerary(state)
 
-
-# ===================================================
+# ======================================================
 # VALIDATOR
-# ===================================================
+# ======================================================
 
 with layout["validator"]:
 
-    st.info("✅ Trip Validator")
+    render_trip_validator(state)
 
-
-# ===================================================
+# ======================================================
 # AUDIT
-# ===================================================
+# ======================================================
 
 with layout["audit"]:
 
-    st.info("📋 Audit Dashboard")
+    render_audit_dashboard(state)
