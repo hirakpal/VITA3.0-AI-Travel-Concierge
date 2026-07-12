@@ -173,11 +173,11 @@ class TravelDNA(BaseModel):
 
         }
 
-        if interest not in mapping:
+        attr = mapping.get(interest.strip().title())
+
+        if attr is None:
 
             return
-
-        attr = mapping[interest]
 
         value = getattr(self, attr)
 
