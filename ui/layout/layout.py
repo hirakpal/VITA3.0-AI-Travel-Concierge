@@ -3,36 +3,34 @@ import streamlit as st
 
 def render_layout():
 
-    top_left,top_center,top_right = st.columns(
-        [3,5,2]
-    )
+    chat, map_panel, mission = st.columns([3, 5, 2])
 
-    bottom_left,bottom_right = st.columns(
-        [7,3]
-    )
+    destinations, travel_dna = st.columns([7, 3])
 
-    timeline,validator = st.columns(
-        [7,3]
-    )
+    recommendations, validator = st.columns([7, 3])
+
+    timeline = st.container()
 
     audit = st.container()
 
     return {
 
-        "chat":top_left,
+        "chat": chat,
 
-        "map":top_center,
+        "map": map_panel,
 
-        "mission":top_right,
+        "mission": mission,
 
-        "recommendations":bottom_left,
+        "destinations": destinations,
 
-        "travel_dna":bottom_right,
+        "travel_dna": travel_dna,
 
-        "timeline":timeline,
+        "recommendations": recommendations,
 
-        "validator":validator,
+        "validator": validator,
 
-        "audit":audit
+        "timeline": timeline,
+
+        "audit": audit
 
     }
