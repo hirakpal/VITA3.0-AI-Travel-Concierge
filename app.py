@@ -27,6 +27,7 @@ from ui.travel_dna.travel_dna import render_travel_dna
 from ui.validator.trip_validator_panel import render_trip_validator
 from ui.audit.audit_dashboard import render_audit_dashboard
 from ui.mission.mission_control import render_mission_control
+from state.vita_state import VitaState
 
 # ======================================================
 # PAGE
@@ -50,9 +51,9 @@ if "session_id" not in st.session_state:
 
 if "state" not in st.session_state:
 
-    st.session_state.state = workflow.run(
+    st.session_state.state = VitaState(
         session_id="demo",
-        message="Hello"
+        
     )
 
 # ======================================================
