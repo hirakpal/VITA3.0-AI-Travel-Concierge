@@ -38,7 +38,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-apply_theme()
+load_theme()
 
 # ======================================================
 # SESSION
