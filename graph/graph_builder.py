@@ -44,6 +44,13 @@ def discovery_node(state: VitaState):
 
     return state
 
+def discovery_router(state: VitaState):
+
+    if state.traveller.confidence < 0.80:
+
+        return "conversation"
+
+    return "map"
 
 def map_node(state: VitaState):
 
