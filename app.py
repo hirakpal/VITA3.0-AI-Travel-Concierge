@@ -2,6 +2,7 @@ from ui.layout.theme import apply_theme
 from ui.layout.header import render_header
 from ui.layout.sidebar import render_sidebar
 from ui.layout.layout import render_layout
+import streamlit as st
 
 apply_theme()
 
