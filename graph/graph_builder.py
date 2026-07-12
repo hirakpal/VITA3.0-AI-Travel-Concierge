@@ -65,6 +65,14 @@ def planner_node(state: VitaState):
 
     return state
 
+def planner_router(state: VitaState):
+
+    if state.validation_score < 0.80:
+
+        return "conversation"
+
+    return "recommendation"
+
 
 def recommendation_node(state: VitaState):
 
@@ -78,6 +86,14 @@ def recommendation_node(state: VitaState):
 def approval_node(state: VitaState):
 
     return state
+
+def approval_router(state: VitaState):
+
+    if state.approved:
+
+        return END
+
+    return "planner"
 
 
 # -------------------------------------------------------
@@ -100,16 +116,52 @@ builder.add_node("approval", approval_node)
 
 builder.set_entry_point("conversation")
 
-builder.add_edge("conversation", "discovery")
+builder.add_conditional_edges(
 
-builder.add_edge("discovery", "map")
+    "discovery",
 
-builder.add_edge("map", "planner")
+    discovery_router,
 
-builder.add_edge("planner", "recommendation")
+    {
 
-builder.add_edge("recommendation", "approval")
+        "conversation": "conversation",
 
-builder.add_edge("approval", END)
+        "map": "map"
+
+    }
+
+)
+
+builder.add_conditional_edges(
+
+    "planner",
+
+    planner_router,
+
+    {
+
+        "conversation": "conversation",
+
+        "recommendation": "recommendation"
+
+    }
+
+)
+
+builder.add_conditional_edges(
+
+    "approval",
+
+    approval_router,
+
+    {
+
+        "planner": "planner",
+
+        END: END
+
+    }
+
+)
 
 graph = builder.compile()
