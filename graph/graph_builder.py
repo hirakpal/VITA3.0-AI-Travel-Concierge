@@ -166,12 +166,15 @@ def planner_router(state: VitaState):
 # Approval Router
 # ---------------------------------------------------------
 
-def approval_router(state: VitaState):
+def approval_router(state):
 
     if state.approval_status == "APPROVED":
         return END
 
-    return "planner"
+    if state.approval_status == "REPLAN":
+        return "planner"
+
+    return END
 
 
 # ==========================================================
