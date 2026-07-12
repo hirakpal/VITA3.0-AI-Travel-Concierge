@@ -65,7 +65,7 @@ render_header()
 # LAYOUT
 # ======================================================
 
-layout = create_layout()
+layout = render_layout()
 
 state = st.session_state.state
 
