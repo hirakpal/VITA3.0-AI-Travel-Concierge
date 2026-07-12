@@ -23,13 +23,6 @@ TEXT_SECONDARY = "#94A3B8"
 
 def apply_theme():
 
-    st.set_page_config(
-        page_title="VITA 3.0",
-        page_icon="🌍",
-        layout="wide",
-        initial_sidebar_state="collapsed"
-    )
-
     st.markdown(
         f"""
 <style>

@@ -35,6 +35,7 @@ from state.vita_state import VitaState
 
 st.set_page_config(
     page_title="VITA 3.0",
+    page_icon="🌍",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
@@ -89,6 +90,15 @@ with layout["chat"]:
         )
 
         st.session_state.state = state
+
+        if state.assistant_response:
+
+            st.session_state.messages.append(
+                {
+                    "role": "assistant",
+                    "content": state.assistant_response
+                }
+            )
 
         st.rerun()
 

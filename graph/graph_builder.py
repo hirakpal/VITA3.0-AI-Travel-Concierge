@@ -35,6 +35,8 @@ approval = ApprovalAgent()
 
 def conversation_node(state: VitaState):
 
+    state.set_stage("Conversation")
+
     return conversation.execute(state)
 
 
@@ -43,6 +45,8 @@ def conversation_node(state: VitaState):
 # ---------------------------------------------------------
 
 def discovery_node(state: VitaState):
+
+    state.set_stage("Discovery")
 
     return discovery.execute(state)
 
@@ -88,6 +92,8 @@ def clarification_node(state: VitaState):
 
 def map_node(state: VitaState):
 
+    state.set_stage("Map")
+
     return map_agent.execute(state)
 
 
@@ -96,6 +102,8 @@ def map_node(state: VitaState):
 # ---------------------------------------------------------
 
 def planner_node(state: VitaState):
+
+    state.set_stage("Planner")
 
     return planner.execute(state)
 
@@ -106,6 +114,8 @@ def planner_node(state: VitaState):
 
 def recommendation_node(state: VitaState):
 
+    state.set_stage("Recommendation")
+
     return recommendation.execute(state)
 
 # ---------------------------------------------------------
@@ -113,6 +123,8 @@ def recommendation_node(state: VitaState):
 # ---------------------------------------------------------
 
 def approval_node(state: VitaState):
+
+    state.set_stage("Approval")
 
     return approval.execute(state)
 
@@ -163,18 +175,23 @@ def planner_router(state: VitaState):
 
 
 # ---------------------------------------------------------
-# Approval Router
+# Post-Conversation Router
 # ---------------------------------------------------------
 
-def approval_router(state: VitaState):
+def post_conversation_router(state: VitaState):
 
-    if state.approved:
-        return END
+    """
+    A trip is only awaiting approval once recommendations have
+    already been generated on a *previous* turn. In that case the
+    traveller's new message is their approve/reject/edit decision,
+    so route straight to approval instead of re-running the whole
+    discovery -> map -> planner -> recommendation pipeline.
+    """
 
-    if getattr(state, "rejected", False):
-        return END
+    if state.awaiting_approval:
+        return "approval"
 
-    return "planner"
+    return "discovery"
 
 
 # ==========================================================
@@ -208,12 +225,23 @@ builder.add_node("approval", approval_node)
 builder.set_entry_point("conversation")
 
 # ----------------------------------------------------------
-# Fixed Edge
+# Post-Conversation Routing
 # ----------------------------------------------------------
 
-builder.add_edge(
+builder.add_conditional_edges(
+
     "conversation",
-    "discovery"
+
+    post_conversation_router,
+
+    {
+
+        "discovery": "discovery",
+
+        "approval": "approval"
+
+    }
+
 )
 
 # ----------------------------------------------------------
@@ -292,31 +320,31 @@ builder.add_conditional_edges(
 # Recommendation
 # ----------------------------------------------------------
 
+# Recommendations are generated, awaiting_approval is set, and the
+# turn ends here. The traveller's next message is their decision,
+# which post_conversation_router routes straight to "approval".
+
 builder.add_edge(
 
     "recommendation",
 
-    "approval"
+    END
 
 )
 
 # ----------------------------------------------------------
-# Approval Routing
+# Approval
 # ----------------------------------------------------------
 
-builder.add_conditional_edges(
+# approve / reject / edit / replan are all resolved within a single
+# turn; any follow-up work (a new itinerary, a fresh conversation)
+# happens on the traveller's next message, re-entering at the top.
+
+builder.add_edge(
 
     "approval",
 
-    approval_router,
-
-    {
-
-        "planner": "planner",
-
-        END: END
-
-    }
+    END
 
 )
 

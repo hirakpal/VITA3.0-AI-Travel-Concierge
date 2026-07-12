@@ -21,6 +21,16 @@ from models.itinerary import Itinerary
 from models.response import AgentResponse
 
 
+STAGE_PROGRESS = {
+    "Conversation": 1 / 6,
+    "Discovery": 2 / 6,
+    "Map": 3 / 6,
+    "Planner": 4 / 6,
+    "Recommendation": 5 / 6,
+    "Approval": 1.0,
+}
+
+
 class VitaState(BaseModel):
 
     model_config = ConfigDict(
@@ -78,6 +88,10 @@ class VitaState(BaseModel):
     current_agent: str = "Conversation"
 
     current_step: str = "Idle"
+
+    current_stage: str = "Conversation"
+
+    progress: float = 0.0
 
     workflow_status: str = "READY"
 
@@ -179,6 +193,12 @@ class VitaState(BaseModel):
 
         self.current_step = step
 
+    def set_stage(self, stage: str):
+
+        self.current_stage = stage
+
+        self.progress = STAGE_PROGRESS.get(stage, self.progress)
+
     def set_response(self, response: AgentResponse):
 
         self.last_response = response
@@ -205,9 +225,13 @@ class VitaState(BaseModel):
 
     def reset(self):
 
-        self.__dict__.update(
-            VitaState().model_dump()
+        fresh = VitaState(
+            session_id=self.session_id,
+            user_id=self.user_id,
         )
+
+        for field in fresh.model_fields:
+            setattr(self, field, getattr(fresh, field))
 
     @property
     def total_destinations(self):
