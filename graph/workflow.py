@@ -16,6 +16,11 @@ class Workflow:
         # Update latest user message
         state.user_input = message
 
+        print("===== BEFORE GRAPH =====")
+        print(type(state))
+        print(type(state.recommendations))
+        print(state.recommendations)
+
         # Execute LangGraph
         state = graph.invoke(state)
 
