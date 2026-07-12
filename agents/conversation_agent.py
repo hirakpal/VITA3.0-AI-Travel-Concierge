@@ -19,6 +19,25 @@ class ConversationManager(BaseAgent):
     def __init__(self):
 
         super().__init__("ConversationManager")
+    # =====================================================
+# LangGraph Entry Point
+# =====================================================
+    def execute(self, state):
+        response = self.run(
+            state=state,
+            message=state.user_input
+        )
+
+        # Persist response in workflow state
+        state.set_response(response)
+
+        state.set_agent("Conversation Manager")
+        state.set_step("Conversation")
+
+        if response.success:
+            state.workflow_status = "RUNNING"
+        
+    return state
 
     # =====================================================
     # Main Router
