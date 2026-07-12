@@ -6,9 +6,9 @@ load_dotenv()
 
 class Settings:
 
-    APP_NAME = "VITA 2.0"
+    APP_NAME = "VITA 3.0"
 
-    VERSION = "2.0"
+    VERSION = "3.0"
 
     GEMINI_MODEL = "gemini-2.5-pro"
 
