@@ -115,7 +115,53 @@ def recommendation_node(state: VitaState):
 
 def approval_node(state: VitaState):
 
-    return approval.execute(state)
+    message = state.user_input.strip().lower()
+
+    if any(x in message for x in [
+        "approve",
+        "approved",
+        "yes",
+        "confirm",
+        "ok",
+        "okay"
+    ]):
+
+        decision = "approve"
+
+    elif any(x in message for x in [
+        "reject",
+        "no",
+        "cancel"
+    ]):
+
+        decision = "reject"
+
+    elif any(x in message for x in [
+        "replan",
+        "change",
+        "modify",
+        "another",
+        "different"
+    ]):
+
+        decision = "replan"
+
+    elif any(x in message for x in [
+        "edit"
+    ]):
+
+        decision = "edit"
+
+    else:
+
+        decision = "approve"
+
+    approval.run(
+        state=state,
+        decision=decision
+    )
+
+    return state
 
 # ==========================================================
 # Build Router
@@ -168,13 +214,15 @@ def planner_router(state: VitaState):
 
 def approval_router(state):
 
-    if state.approval_status == "APPROVED":
+    if state.approved:
+
         return END
 
-    if state.approval_status == "REPLAN":
-        return "planner"
+    if state.rejected:
 
-    return END
+        return END
+
+    return "planner"
 
 
 # ==========================================================
