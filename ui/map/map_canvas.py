@@ -8,7 +8,6 @@ from pathlib import Path
 import streamlit as st
 import streamlit.components.v1 as components
 
-
 HTML_FILE = Path("assets/google_map.html")
 
 
@@ -17,57 +16,62 @@ def render_map_canvas(state):
     st.subheader("🗺️ Destination Explorer")
 
     if not HTML_FILE.exists():
-
         st.error("google_map.html not found.")
-
         return
 
+    # Read HTML
     html = HTML_FILE.read_text(encoding="utf-8")
+
+    # Inject API Key from Streamlit Secrets
+    api_key = st.secrets.get("GOOGLE_MAPS_API_KEY", "")
+
+    if not api_key:
+        st.error("GOOGLE_MAPS_API_KEY not found in Streamlit Secrets.")
+        return
+
+    html = html.replace(
+        "YOUR_GOOGLE_MAPS_API_KEY",
+        api_key
+    )
 
     components.html(
         html,
-        height=520,
+        height=550,
         scrolling=False,
     )
 
     st.divider()
 
-    st.markdown("### Selected Destinations")
+    st.subheader("📍 Selected Destinations")
 
-    if not state.destinations:
+    destinations = getattr(state, "destinations", [])
 
+    if not destinations:
         st.info("No destinations selected yet.")
-
         return
 
-    for destination in state.destinations:
+    for d in destinations:
 
-        with st.container(border=True):
+        if isinstance(d, dict):
 
-            if isinstance(destination, dict):
+            st.container(border=True)
 
-                st.markdown(
-                    f"""
-**📍 {destination.get('city','Unknown')}**
+            st.write(f"**{d.get('city','Unknown')}**")
 
-Country: {destination.get('country','')}
+            st.caption(d.get("country",""))
 
-Latitude: {destination.get('lat','')}
+            st.write(
+                f"{d.get('lat','')} , {d.get('lng','')}"
+            )
 
-Longitude: {destination.get('lng','')}
-"""
-                )
+        else:
 
-            else:
+            st.container(border=True)
 
-                st.markdown(
-                    f"""
-**📍 {destination.city}**
+            st.write(f"**{d.city}**")
 
-Country: {destination.country}
+            st.caption(d.country)
 
-Latitude: {destination.coordinates.latitude}
-
-Longitude: {destination.coordinates.longitude}
-"""
-                )
+            st.write(
+                f"{d.coordinates.latitude} , {d.coordinates.longitude}"
+            )
