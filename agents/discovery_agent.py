@@ -36,6 +36,15 @@ class DiscoveryAgent(BaseAgent):
     # Main
     # =====================================================
 
+    def execute(self, state):
+        response = self.run(state)
+
+        state.set_response(response)
+        state.set_agent("Discovery Agent")
+        state.set_step("Discovery")
+        
+        return state
+    
     def run(
         self,
         state,
