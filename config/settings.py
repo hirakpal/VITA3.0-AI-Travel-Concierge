@@ -10,7 +10,7 @@ class Settings:
 
     VERSION = "3.0"
 
-    GEMINI_MODEL = "gemini-2.5-pro"
+    GEMINI_MODEL = "gemini-2.5-flash"
 
     GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
 
