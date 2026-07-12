@@ -325,3 +325,6 @@ def section(title: str, icon: str = ""):
 """,
         unsafe_allow_html=True,
     )
+# Alias so old code continues working
+def load_theme():
+    apply_theme()
